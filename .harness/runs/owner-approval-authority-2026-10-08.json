@@ -1,0 +1,19 @@
+{
+  "run_id": "owner-approval-authority-2026-10-08",
+  "task_domain": "GOVERNANCE_BOOTSTRAP",
+  "authority_source": "/workspace/scratch/99e6ff3f9161/wingman-owner-approval-authority-task.txt",
+  "authority_sha256": "965d5788362bea1a6d75eb3200db3adcc74938f992d374719e4cf4cb84f0bfc5",
+  "construction_contract": "/workspace/scratch/99e6ff3f9161/wingman-owner-approval-authority-construction-contract.md",
+  "construction_contract_sha256": "423520c43bc3b57e6cd740defac48c6c5ce4022662d658405325c766100b9fd4",
+  "base_commit": "c92e695344f00fb30698cd494be4b8abf907e6ee",
+  "base_candidate_sha256": "ae669db6f000a54e9456ba81fc8c8b3f834bfefa2cf9012a65c44ad8e074f7d9",
+  "verified_gap": "Current repository precedence and protected-action rules prevent an authenticated owner response of Approved from executing the preceding bounded proposal.",
+  "governing_rule": "Current explicit authenticated owner instruction",
+  "next_permitted_action": "Correct owner precedence and approval execution semantics and add deterministic controls.",
+  "stop_condition": "Stop on scope expansion, more than 500 changed lines, any deterministic verifier failure, or an identity mismatch.",
+  "waived_repository_predicates": [
+    "Historical plan-only limitation for this bounded governance correction",
+    "Separate governance-change authorization beyond the current direct owner instruction"
+  ],
+  "status": "EXECUTED_CANDIDATE_UNVERIFIED"
+}

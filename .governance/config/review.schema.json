@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "wingman/governance/review-config/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["mechanism", "maximum_cycles", "maximum_cycles_owner_approved", "scope", "reviewer_identity", "reviewer_independent", "first_cycle_requires_exact_head_ci", "later_cycles_require_evidence_and_ci", "unresolved_actionable_findings", "cycle_limit_result", "additional_cycle_authority", "carry_forward_rule", "merge_effect"],
+  "properties": {
+    "mechanism": {"enum": ["Codex", "human", "approved_independent_reviewer"]},
+    "maximum_cycles": {"type": "integer", "const": 3},
+    "maximum_cycles_owner_approved": {"const": true},
+    "scope": {"const": "entire_applicable_authored_change"},
+    "reviewer_identity": {"type": "string", "minLength": 1, "pattern": "^(?!<).+"},
+    "reviewer_independent": {"const": true},
+    "first_cycle_requires_exact_head_ci": {"const": true},
+    "later_cycles_require_evidence_and_ci": {"const": true},
+    "unresolved_actionable_findings": {"type": "integer", "const": 0},
+    "cycle_limit_result": {"const": "BLOCKED"},
+    "additional_cycle_authority": {"const": "explicit_owner_authorization"},
+    "carry_forward_rule": {"const": "equivalent_effective_diff_and_fresh_exact_head_ci"},
+    "merge_effect": {"const": "NONE"}
+  }
+}

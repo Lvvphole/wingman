@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "wingman/governance/privileged-boundaries/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["boundaries", "supervisor_identity", "agent_identity", "sandbox", "tool_allowlist", "filesystem_boundaries", "protected_locations", "secret_policy", "network_permissions", "git_permissions", "evidence_provenance", "promotion_enforcement", "independently_verified"],
+  "properties": {
+    "boundaries": {
+      "type": "object", "additionalProperties": false,
+      "required": ["PB-01", "PB-02", "PB-03", "PB-04", "PB-05", "PB-06", "PB-07", "PB-08", "PB-09", "PB-10"],
+      "properties": {
+        "PB-01": {"$ref": "#/$defs/boundary"}, "PB-02": {"$ref": "#/$defs/boundary"},
+        "PB-03": {"$ref": "#/$defs/boundary"}, "PB-04": {"$ref": "#/$defs/boundary"},
+        "PB-05": {"$ref": "#/$defs/boundary"}, "PB-06": {"$ref": "#/$defs/boundary"},
+        "PB-07": {"$ref": "#/$defs/boundary"}, "PB-08": {"$ref": "#/$defs/boundary"},
+        "PB-09": {"$ref": "#/$defs/boundary"}, "PB-10": {"$ref": "#/$defs/boundary"}
+      }
+    },
+    "supervisor_identity": {"type": "string", "minLength": 1, "pattern": "^(?!<).+"},
+    "agent_identity": {"type": "string", "minLength": 1, "pattern": "^(?!<).+"},
+    "sandbox": {"type": "string", "minLength": 1, "pattern": "^(?!<).+"},
+    "tool_allowlist": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "filesystem_boundaries": {"type": "object", "required": ["read", "write"], "properties": {"read": {"type": "array", "items": {"type": "string"}}, "write": {"type": "array", "items": {"type": "string"}}}},
+    "protected_locations": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "secret_policy": {"type": "string", "minLength": 1},
+    "network_permissions": {"type": "array", "items": {"type": "string"}},
+    "git_permissions": {"type": "array", "items": {"type": "string"}},
+    "evidence_provenance": {"type": "string", "minLength": 1, "pattern": "^(?!<).+"},
+    "promotion_enforcement": {"type": "string", "minLength": 1, "pattern": "^(?!<).+"},
+    "independently_verified": {"const": true}
+  },
+  "$defs": {
+    "boundary": {"type": "object", "additionalProperties": false, "required": ["separation", "enforcement_evidence"], "properties": {"separation": {"type": "string", "minLength": 1}, "enforcement_evidence": {"type": "string", "minLength": 1, "pattern": "^(?!<).+"}}}
+  }
+}

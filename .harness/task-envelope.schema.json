@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "wingman/harness/task-envelope/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["task_domains", "source_sections", "workpiece_paths", "selected_evidence_ids", "authorized_candidate_paths", "approvals", "source_binding"],
+  "properties": {
+    "task_domains": {"type": "array", "minItems": 1, "maxItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "source_sections": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "workpiece_paths": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*\\.\\.).+"}},
+    "selected_evidence_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "authorized_candidate_paths": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*\\.\\.).+"}},
+    "approvals": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "source_binding": {
+      "type": "object", "additionalProperties": false,
+      "required": ["commit", "staged_diff_sha256", "unstaged_diff_sha256", "untracked_manifest_sha256", "dirty_submodule_manifest_sha256", "excluded_plan_path"],
+      "properties": {
+        "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "staged_diff_sha256": {"$ref": "#/$defs/sha256"},
+        "unstaged_diff_sha256": {"$ref": "#/$defs/sha256"},
+        "untracked_manifest_sha256": {"$ref": "#/$defs/sha256"},
+        "dirty_submodule_manifest_sha256": {"$ref": "#/$defs/sha256"},
+        "excluded_plan_path": {"type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*\\.\\.).+"}
+      }
+    }
+  },
+  "$defs": {"sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}
+}

@@ -1,0 +1,14 @@
+{
+  "run_id": "compact-routing-worktree-lifecycle-2026-10-08",
+  "task_domain": "GOVERNANCE_BOOTSTRAP",
+  "authority_source": "/workspace/scratch/99e6ff3f9161/wingman-compact-routing-worktree-lifecycle-task.txt",
+  "authority_sha256": "4fcf6ea70c2648f2f3135b3a50ff81308e24577ef079a4d7272eeeb2de1392f5",
+  "construction_contract": "/workspace/scratch/99e6ff3f9161/wingman-compact-routing-worktree-lifecycle-construction-contract.md",
+  "construction_contract_sha256": "cac494471e3f337b03783faa19d9705f88e7e6f132b28fa01a99cebe17c4f0fd",
+  "base_commit": "c92e695344f00fb30698cd494be4b8abf907e6ee",
+  "base_candidate_sha256": "498c540665be1fccab4ca86ba73c6600dcfdeb54249a411278cf3d87d2d1e551",
+  "verified_gap": "Root routing is verbose and no deterministic isolated-worktree to PR Verification to Codex-review lifecycle exists.",
+  "next_permitted_action": "Compact the root map and add the bounded lifecycle policy, schema, and verifier controls.",
+  "stop_condition": "Stop on scope expansion, more than 500 changed lines, identity mismatch, or verifier failure.",
+  "status": "EXECUTED_CANDIDATE_UNVERIFIED"
+}

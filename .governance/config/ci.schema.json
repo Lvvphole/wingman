@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "wingman/governance/ci-config/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["repository", "protected_branch", "provider", "required_checks", "runner_ids", "commands", "surface_applicability", "change_size_verifier", "exact_head_verifier", "independent_verifier", "owner_approved"],
+  "properties": {
+    "repository": {"type": "string", "const": "Lvvphole/wingman"},
+    "protected_branch": {"type": "string", "minLength": 1, "pattern": "^(?!<).+"},
+    "provider": {"type": "string", "minLength": 1, "pattern": "^(?!<).+"},
+    "required_checks": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/check"}},
+    "runner_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1, "pattern": "^(?!<).+"}},
+    "commands": {
+      "type": "object", "additionalProperties": false,
+      "required": ["dependency", "lint_format", "static_type", "unit", "integration_contract", "build_package", "security", "regression"],
+      "properties": {"dependency": {"$ref": "#/$defs/operation"}, "lint_format": {"$ref": "#/$defs/operation"}, "static_type": {"$ref": "#/$defs/operation"}, "unit": {"$ref": "#/$defs/operation"}, "integration_contract": {"$ref": "#/$defs/operation"}, "build_package": {"$ref": "#/$defs/operation"}, "security": {"$ref": "#/$defs/operation"}, "regression": {"$ref": "#/$defs/operation"}}
+    },
+    "surface_applicability": {"type": "object", "additionalProperties": false, "required": ["database", "api", "ui", "security_sensitive", "agent_harness", "release"], "properties": {"database": {"$ref": "#/$defs/applicability"}, "api": {"$ref": "#/$defs/applicability"}, "ui": {"$ref": "#/$defs/applicability"}, "security_sensitive": {"$ref": "#/$defs/applicability"}, "agent_harness": {"$ref": "#/$defs/applicability"}, "release": {"$ref": "#/$defs/applicability"}}},
+    "change_size_verifier": {"$ref": "#/$defs/operation"},
+    "exact_head_verifier": {"$ref": "#/$defs/operation"},
+    "independent_verifier": {"type": "object", "additionalProperties": false, "required": ["identity", "authority_boundary"], "properties": {"identity": {"type": "string", "minLength": 1, "pattern": "^(?!<).+"}, "authority_boundary": {"type": "string", "minLength": 1, "pattern": "^(?!<).+"}}},
+    "owner_approved": {"const": true}
+  },
+  "$defs": {
+    "operation": {"type": "object", "additionalProperties": false, "required": ["id", "operation"], "properties": {"id": {"type": "string", "minLength": 1, "pattern": "^(?!<).+"}, "operation": {"type": "string", "minLength": 1, "pattern": "^(?!<).+"}}},
+    "check": {"type": "object", "additionalProperties": false, "required": ["id", "applicability", "runner_id", "operation"], "properties": {"id": {"type": "string", "minLength": 1, "pattern": "^(?!<).+"}, "applicability": {"type": "string", "minLength": 1}, "runner_id": {"type": "string", "minLength": 1}, "operation": {"type": "string", "minLength": 1}}},
+    "applicability": {"type": "object", "additionalProperties": false, "required": ["predicate", "required_checks", "non_applicability_rule"], "properties": {"predicate": {"type": "string", "minLength": 1}, "required_checks": {"type": "array", "items": {"type": "string"}}, "non_applicability_rule": {"type": "string", "minLength": 1}}}
+  }
+}

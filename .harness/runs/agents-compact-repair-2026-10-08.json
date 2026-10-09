@@ -1,0 +1,13 @@
+{
+  "run_id": "agents-compact-repair-2026-10-08",
+  "task_domain": "GOVERNANCE_BOOTSTRAP",
+  "authority_source": "/workspace/scratch/99e6ff3f9161/wingman-agents-compact-repair-task.txt",
+  "authority_sha256": "c70cfe82f00890c75cfe0ebf618375c887bbe5f0071a667e2ef8599bdf71ed54",
+  "construction_contract": "/workspace/scratch/99e6ff3f9161/wingman-agents-compact-repair-construction-contract.md",
+  "construction_contract_sha256": "d544685b07a49901f7c1fb321e8621f1ef897a1182f07f9c8293d48762371249",
+  "base_candidate_sha256": "461bcbc8247551d664310b57e5ab6c2463e2392076ca3f9606c0c3e86a47c40c",
+  "verified_gap": "The attempted compact AGENTS.md remained a 48-line six-section governance template.",
+  "targeted_fix": "Replace it with a maximum-25-line root router and update its structural verifier.",
+  "stop_condition": "Stop if required routing is lost, the file exceeds 25 lines, or verification fails.",
+  "status": "EXECUTED_CANDIDATE_UNVERIFIED"
+}

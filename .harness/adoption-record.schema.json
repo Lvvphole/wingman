@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "wingman/harness/adoption-record/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["status", "candidate_identity", "predicates", "independent_verifier", "verified_at"],
+  "properties": {
+    "status": {"const": "ADOPTED"},
+    "candidate_identity": {"type": "string", "minLength": 1},
+    "predicates": {
+      "type": "object", "additionalProperties": false,
+      "required": ["AD-01", "AD-02", "AD-03", "AD-04", "AD-05", "AD-06", "AD-07", "AD-08", "AD-09", "AD-10", "AD-11", "AD-12", "AD-13", "AD-14"],
+      "properties": {
+        "AD-01": {"$ref": "#/$defs/pass"}, "AD-02": {"$ref": "#/$defs/pass"},
+        "AD-03": {"$ref": "#/$defs/pass"}, "AD-04": {"$ref": "#/$defs/pass"},
+        "AD-05": {"$ref": "#/$defs/pass"}, "AD-06": {"$ref": "#/$defs/pass"},
+        "AD-07": {"$ref": "#/$defs/pass"}, "AD-08": {"$ref": "#/$defs/pass"},
+        "AD-09": {"$ref": "#/$defs/pass"}, "AD-10": {"$ref": "#/$defs/pass"},
+        "AD-11": {"$ref": "#/$defs/pass"}, "AD-12": {"$ref": "#/$defs/pass"},
+        "AD-13": {"$ref": "#/$defs/pass"}, "AD-14": {"$ref": "#/$defs/pass"}
+      }
+    },
+    "independent_verifier": {"type": "string", "minLength": 1},
+    "verified_at": {"type": "string", "format": "date-time"}
+  },
+  "$defs": {"pass": {"type": "object", "additionalProperties": false, "required": ["result", "evidence_ref"], "properties": {"result": {"const": true}, "evidence_ref": {"type": "string", "minLength": 1}}}}
+}

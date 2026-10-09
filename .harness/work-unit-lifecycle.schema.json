@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Wingman work-unit lifecycle record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "work_unit_id", "unit_kind", "task_contract", "worktree_path",
+    "branch", "unique_worktree", "base_sha", "state", "pr_number",
+    "pr_head_sha", "ci_context", "ci_result", "ci_head_sha",
+    "codex_review_state", "evidence_reference"
+  ],
+  "properties": {
+    "work_unit_id": {"type": "string", "pattern": "^(INC|SPRINT)-[A-Za-z0-9][A-Za-z0-9._-]*$"},
+    "unit_kind": {"enum": ["INC", "SPRINT"]},
+    "task_contract": {"type": "string", "minLength": 1},
+    "worktree_path": {"type": "string", "minLength": 1},
+    "branch": {"type": "string", "minLength": 1},
+    "unique_worktree": {"type": "boolean"},
+    "base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "state": {"enum": ["CREATED", "MUTATING", "PR_OPEN", "CI_PENDING", "CI_GREEN", "CODEX_REVIEW", "REVIEW_ACCEPTED", "MERGE_ELIGIBLE", "CLOSED"]},
+    "pr_number": {"type": ["integer", "null"], "minimum": 1},
+    "pr_head_sha": {"type": ["string", "null"], "pattern": "^[0-9a-f]{40}$"},
+    "ci_context": {"type": ["string", "null"]},
+    "ci_result": {"enum": [null, "PENDING", "PASS", "FAIL", "CANCELLED", "INCONCLUSIVE"]},
+    "ci_head_sha": {"type": ["string", "null"], "pattern": "^[0-9a-f]{40}$"},
+    "codex_review_state": {"enum": ["NOT_STARTED", "IN_PROGRESS", "ACCEPTED", "CHANGES_REQUIRED"]},
+    "evidence_reference": {"type": ["string", "null"]}
+  }
+}

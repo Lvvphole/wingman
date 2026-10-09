@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "wingman/harness/blocked-record/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["status", "reason_code", "gate_id", "route_candidates", "missing_inputs", "conflicts", "source_binding", "resolution_required"],
+  "properties": {
+    "status": {"const": "BLOCKED"},
+    "reason_code": {"type": "string", "minLength": 1},
+    "gate_id": {"type": "string", "minLength": 1},
+    "route_candidates": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+    "missing_inputs": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+    "conflicts": {"type": "array", "items": {"type": "string"}},
+    "source_binding": {"type": ["object", "null"]},
+    "resolution_required": {"type": "string", "minLength": 1}
+  }
+}
