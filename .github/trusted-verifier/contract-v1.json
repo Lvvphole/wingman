@@ -2,6 +2,32 @@
   "version": "1.0",
   "repository": "Lvvphole/wingman",
   "target_branch": "main",
-  "admission_enabled": false,
-  "required_file_sha256": {}
+  "route": "GOVERNANCE_BOOTSTRAP",
+  "task_contract": ".harness/contracts/governance-bootstrap.md",
+  "task_envelope_schema": {"path": ".harness/task-envelope.schema.json", "sha256": "e3621f34a56043c21d3b596f626609b7ff563b5ef803eaa4b0b0760dad7f4376"},
+  "lifecycle_schema": {"path": ".harness/work-unit-lifecycle.schema.json", "sha256": "5384f1bcf0c3b3c8294e12aff9cc142e848b39717c3ba21952d21192f992b365"},
+  "source_registry": ".governance/source-registry.md",
+  "original_base_sha": "c92e695344f00fb30698cd494be4b8abf907e6ee",
+  "required_approvals": ["USER_DOMAIN_GOVERNANCE_BOOTSTRAP", "USER_LOC_CEILING_500", "USER_APPROVED_PLAN_EB45E338"],
+  "authorized_candidate_paths": [".github/workflows/pr-verification.yml", ".harness/", ".governance/", ".markdownlint-cli2.jsonc", "AGENTS.md", "CLAUDE.md", "CONTEXT.md", "pyproject.toml", "scripts/verify-governance.py", "tests/"],
+  "fixed_sources": [
+    {"id": "PLAN-V0.2", "kind": "local", "locator": "plans/wingman-governance-router-plan-v0.2.md", "binding": "eb45e3381ead580cf41db4e2cbf1d6667dfb55d869c1208620caf7db5fa9905f"},
+    {"id": "ENGINEERING-53", "kind": "local", "locator": ".governance/engineering-rules.md", "binding": "b75b490208f51d39339fb1df0855a296f3b1b3c76399c18c4bd76c08ca63f3f6"},
+    {"id": "DESIGN-V0.3", "kind": "external", "locator": "Persistent sealed Design Authority Record", "binding": "b4a1a02fc333b7c212186d7b07fb9d2b5536afaf2ae7434c20371ce097c3d10f"},
+    {"id": "PRD-V0.2", "kind": "external", "locator": "Persistent PRD artifact", "binding": "a0283859f2b128c9ef0adcb25922901e135e0aeed64ba42900d8b83701f48be1"},
+    {"id": "READINESS-V0.1", "kind": "external", "locator": "Persistent readiness register", "binding": "b2a97363962c7745e45e46c7e519b403d347a61f0cb55a6ed65aeba4cf9656b8"}
+  ],
+  "size_exempt_files": {"plans/wingman-governance-router-plan-v0.2.md": "eb45e3381ead580cf41db4e2cbf1d6667dfb55d869c1208620caf7db5fa9905f"},
+  "increments": [
+    [".harness/tasks.md", "AGENTS.md", "CLAUDE.md", "CONTEXT.md", ".governance/authority.md"],
+    [".governance/source-registry.md", ".governance/engineering-rules.md", ".governance/invariant-inventory.json", ".governance/execution.md", ".governance/evidence.md"],
+    [".governance/code-review.md", ".governance/verification.md", ".governance/completion.md", ".governance/states.md", ".governance/adoption.md"],
+    [".governance/config/ci.schema.json", ".governance/config/review.schema.json", ".governance/config/branch-protection.schema.json", ".governance/config/permitted-effects.schema.json", ".governance/config/privileged-boundaries.schema.json"],
+    [".harness/route-invariants.md", ".harness/task-envelope.schema.json", ".harness/blocked-record.schema.json", ".harness/input-gates.md", ".harness/pre-code-readiness.md"],
+    [".harness/mutation-gate.md", ".harness/contracts/governance-bootstrap.md", ".harness/negative-controls.json", ".harness/adoption-record.schema.json", ".harness/evals.md", ".harness/runtime-loop.md", ".harness/work-unit-lifecycle.schema.json"],
+    ["scripts/verify-governance.py", ".harness/runs/.gitkeep", ".harness/runs/compact-routing-worktree-lifecycle-2026-10-08.json", ".harness/runs/agents-compact-repair-2026-10-08.json", ".harness/runs/owner-approval-authority-2026-10-08.json"],
+    [".github/workflows/pr-verification.yml", ".markdownlint-cli2.jsonc", "pyproject.toml", "tests/test_verify_governance.py"]
+  ],
+  "maximum_increment_lines": 500,
+  "work_unit": {"work_unit_id": "SPRINT-GOVERNANCE-BOOTSTRAP", "unit_kind": "SPRINT", "task_contract": ".harness/contracts/governance-bootstrap.md", "worktree_path": "/workspace/scratch/99e6ff3f9161/wingman-bootstrap-delivery", "branch": "governance/bootstrap-delivery", "unique_worktree": true}
 }
