@@ -14,7 +14,7 @@ Before mutation, bind the work-unit ID, task contract, unique worktree path, uni
 4. `CI_PENDING` — exact status context `PR Verification` runs for the pull-request head SHA.
 5. `CI_GREEN` — `PR Verification` reports `PASS` for that exact head.
 6. `CODEX_REVIEW` — Codex review is initiated only from `CI_GREEN`.
-7. `REVIEW_ACCEPTED` — no unresolved actionable Codex finding remains for the same head.
+7. `REVIEW_ACCEPTED` — every finding has an evidence-bound thread response and resolution, no actionable finding remains for the same head, and every review-repair patch has nonpositive net code-line growth.
 8. `MERGE_ELIGIBLE` — all technical prerequisites are current; merge still requires separate owner authorization.
 9. `CLOSED` — the pull request is merged or closed and evidence is preserved.
 

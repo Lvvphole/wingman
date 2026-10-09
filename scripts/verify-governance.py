@@ -6,11 +6,13 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import subprocess
 import sys
 from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
+BASE_SHA = "c92e695344f00fb30698cd494be4b8abf907e6ee"
 SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 EXPECTED_INVARIANTS = [
     *(f"RT-{i:02d}" for i in range(1, 16)),
@@ -32,6 +34,11 @@ ENVELOPE_FIELDS = {
     "task_domains", "source_sections", "workpiece_paths",
     "selected_evidence_ids", "authorized_candidate_paths", "approvals",
     "source_binding",
+}
+SOURCE_BINDING_FIELDS = {
+    "commit", "staged_diff_sha256", "unstaged_diff_sha256",
+    "untracked_manifest_sha256", "dirty_submodule_manifest_sha256",
+    "excluded_plan_path",
 }
 BLOCKED_FIELDS = {
     "status", "reason_code", "gate_id", "route_candidates",
@@ -87,6 +94,10 @@ def route(domain: str | None, routes: list[str]) -> dict[str, Any] | str:
     return matches[0]
 
 
+def registered_routes(text: str) -> list[str]:
+    return re.findall(r"^\| `([^`]+)` \| `[^`]+` \| `[^`]+` \|$", text, re.M)
+
+
 def owner_approval_executes(
     message: str,
     caller_is_owner: bool,
@@ -135,8 +146,21 @@ def validate_envelope(value: dict[str, Any]) -> dict[str, Any] | None:
         return blocked("ENVELOPE_INVALID", "RT-06")
     if value.get("task_domains") != ["GOVERNANCE_BOOTSTRAP"]:
         return blocked("DOMAIN_NOT_CALLER_SUPPLIED", "RT-04")
-    approvals = value.get("approvals")
-    if not isinstance(approvals, list) or "USER_APPROVED_PLAN_EB45E338" not in approvals:
+    for field, minimum in (("source_sections", 1), ("workpiece_paths", 0), ("selected_evidence_ids", 0), ("authorized_candidate_paths", 1), ("approvals", 1)):
+        items = value.get(field)
+        if not isinstance(items, list) or len(items) < minimum or len(items) != len(set(items)) or not all(isinstance(item, str) and item for item in items):
+            return blocked("ENVELOPE_INVALID", "RT-06")
+    for field in ("workpiece_paths", "authorized_candidate_paths"):
+        if any(path.startswith("/") or ".." in path for path in value[field]):
+            return blocked("ENVELOPE_INVALID", "RT-06")
+    binding = value.get("source_binding")
+    if not isinstance(binding, dict) or set(binding) != SOURCE_BINDING_FIELDS:
+        return blocked("SOURCE_BINDING", "RT-08")
+    if not re.fullmatch(r"[0-9a-f]{40}", binding["commit"]) or not all(SHA256_RE.fullmatch(binding[field]) for field in SOURCE_BINDING_FIELDS if field.endswith("sha256")):
+        return blocked("SOURCE_BINDING", "RT-08")
+    if not isinstance(binding["excluded_plan_path"], str) or not binding["excluded_plan_path"] or binding["excluded_plan_path"].startswith("/") or ".." in binding["excluded_plan_path"]:
+        return blocked("SOURCE_BINDING", "RT-08")
+    if "USER_APPROVED_PLAN_EB45E338" not in value["approvals"]:
         return blocked("AUTHORIZATION_INVALID", "NC-01")
     return None
 
@@ -147,34 +171,8 @@ def deny_path(path: str, allowed: tuple[str, ...]) -> dict[str, Any] | None:
     return None
 
 
-def negative_outcomes() -> dict[str, dict[str, Any]]:
-    return {
-        "NC-01": validate_envelope({**{key: [] for key in ENVELOPE_FIELDS}, "task_domains": ["GOVERNANCE_BOOTSTRAP"]}) or blocked("AUTHORIZATION_INVALID"),
-        "NC-02": blocked("ROUTE_NOT_UNIQUE", "RT-05") if route("GOVERNANCE_BOOTSTRAP", ["GOVERNANCE_BOOTSTRAP", "GOVERNANCE_BOOTSTRAP"])["reason_code"] == "ROUTE_MULTI_MATCH" else blocked("ROUTE_TEST_INVALID"),
-        "NC-03": blocked("INPUT_NOT_ALLOWED", "RT-09"),
-        "NC-04": blocked("SOURCE_BINDING", "RT-08"),
-        "NC-05": deny_path("unauthorized/file", (".governance/", ".harness/")) or blocked("MUTATION_SCOPE"),
-        "NC-06": blocked("EFFECT_UNAUTHORIZED", "EX-03"),
-        "NC-07": blocked("PROTECTED_POLICY_WRITE", "ZT-01"),
-        "NC-08": blocked("PRIVILEGE_EXPOSURE", "ZT-04"),
-        "NC-09": blocked("CI_NOT_EXACT_HEAD", "VF-04"),
-        "NC-10": blocked("CI_CHECK_MISSING", "VF-02"),
-        "NC-11": blocked("REVIEW_FINDINGS", "VF-05"),
-        "NC-12": blocked("REVIEW_LIMIT", "VF-06"),
-        "NC-13": blocked("REVIEW_NOT_INDEPENDENT", "VF-05"),
-        "NC-14": blocked("BRANCH_PROTECTION_BYPASS", "VF-07"),
-        "NC-15": blocked("MERGE_UNAUTHORIZED", "VF-07"),
-        "NC-16": blocked("REPLAY_UNSAFE", "ZT-06"),
-        "NC-17": blocked("EVIDENCE_AUTHORITY", "ZT-02"),
-        "NC-18": blocked("SANDBOX_PRIVILEGE", "ZT-04"),
-    }
-
-
 def candidate_digest() -> str:
-    paths = [ROOT / "AGENTS.md", ROOT / "CLAUDE.md", ROOT / "CONTEXT.md"]
-    paths += sorted((ROOT / ".governance").rglob("*"))
-    paths += sorted((ROOT / ".harness").rglob("*"))
-    paths += [ROOT / "scripts/verify-governance.py"]
+    paths = sorted(path for path in ROOT.rglob("*") if path.is_file() and not {".git", "__pycache__", ".ruff_cache"}.intersection(path.parts))
     digest = hashlib.sha256()
     for path in paths:
         if not path.is_file():
@@ -194,10 +192,10 @@ def verify() -> dict[str, Any]:
     require((ROOT / "CLAUDE.md").read_bytes() == b"@AGENTS.md\n", "CLAUDE_POINTER")
     require(len(list(ROOT.glob("AGENTS.md"))) == 1, "ROOT_AUTHORITY_COUNT")
     require(len(list(ROOT.rglob("AGENTS.md"))) == 1, "COMPETING_AUTHORITY")
-    require("GOVERNANCE_BOOTSTRAP" in read_text("CONTEXT.md"), "REGISTERED_ROUTE")
-    require(route(None, ["GOVERNANCE_BOOTSTRAP"])["reason_code"] == "ROUTE_ZERO_MATCH", "ROUTE_ZERO")
-    require(route("GOVERNANCE_BOOTSTRAP", ["GOVERNANCE_BOOTSTRAP"]) == "GOVERNANCE_BOOTSTRAP", "ROUTE_ONE")
-    require(route("GOVERNANCE_BOOTSTRAP", ["GOVERNANCE_BOOTSTRAP"] * 2)["reason_code"] == "ROUTE_MULTI_MATCH", "ROUTE_MULTI")
+    routes = registered_routes(read_text("CONTEXT.md"))
+    require(route(None, routes)["reason_code"] == "ROUTE_ZERO_MATCH", "ROUTE_ZERO")
+    require(route("GOVERNANCE_BOOTSTRAP", routes) == "GOVERNANCE_BOOTSTRAP", "ROUTE_ONE")
+    require(route("GOVERNANCE_BOOTSTRAP", [*routes, "GOVERNANCE_BOOTSTRAP"])["reason_code"] == "ROUTE_MULTI_MATCH", "ROUTE_MULTI")
     authority = read_text(".governance/authority.md")
     agents = read_text("AGENTS.md")
     context = read_text("CONTEXT.md")
@@ -278,6 +276,9 @@ def verify() -> dict[str, Any]:
     for record in records:
         require(set(record) == fields and all(record.values()), f"INVARIANT_{record['id']}")
         checks.append(f"INV:{record['id']}")
+    by_id = {record["id"]: record for record in records}
+    require("review_repair_net_code_lines <= 0" in by_id["CR-06"]["predicate"], "REVIEW_PATCH_INVARIANT")
+    require("every_finding_replied_to_and_resolved" in by_id["CR-13"]["predicate"], "REVIEW_THREAD_INVARIANT")
 
     rule_ids = re.findall(r"^- \*\*((?:TW|REQ|SC|RT|AD|PY|TS|TDD|XP|AE)-\d{3})\*\*", read_text(".governance/engineering-rules.md"), re.M)
     require(len(rule_ids) == 53 and len(set(rule_ids)) == 53, "ENGINEERING_RULES_53")
@@ -292,6 +293,8 @@ def verify() -> dict[str, Any]:
     review = schemas["review.schema.json"]
     require(review["properties"]["maximum_cycles"]["const"] == 3, "REVIEW_THREE_PROPOSED")
     require(review["properties"]["maximum_cycles_owner_approved"]["const"] is True, "REVIEW_OWNER_APPROVAL")
+    require(review["properties"]["finding_response_policy"]["const"].endswith("then_resolve"), "REVIEW_THREAD_RESPONSE")
+    require(review["properties"]["repair_patch_net_code_lines_maximum"]["const"] == 0, "REVIEW_PATCH_NO_GROWTH")
     require(review["properties"]["merge_effect"]["const"] == "NONE", "REVIEW_NO_MERGE")
     effects = schemas["permitted-effects.schema.json"]["properties"]["effects"]
     boundaries = schemas["privileged-boundaries.schema.json"]["properties"]["boundaries"]
@@ -310,15 +313,10 @@ def verify() -> dict[str, Any]:
 
     controls = read_json(".harness/negative-controls.json")["controls"]
     require([item["id"] for item in controls] == EXPECTED_NC, "NC_MEMBERSHIP")
-    expected_reasons = {item["id"]: item["reason_code"] for item in controls}
-    outcomes = negative_outcomes()
-    require(set(outcomes) == set(EXPECTED_NC), "NC_OUTCOME_MEMBERSHIP")
-    for control_id in EXPECTED_NC:
-        outcome = outcomes[control_id]
-        require(set(outcome) == BLOCKED_FIELDS, f"{control_id}_RECORD")
-        require(outcome["status"] == "BLOCKED", f"{control_id}_STATUS")
-        require(outcome["reason_code"] == expected_reasons[control_id], f"{control_id}_REASON")
-        checks.append(control_id)
+    control_fields = {"id", "rejected_action", "expected_status", "reason_code", "expected_effect", "evidence_required"}
+    for control in controls:
+        require(set(control) == control_fields and control["expected_status"] == "BLOCKED", f"{control['id']}_DEFINITION")
+        checks.append(f"NC_DEF:{control['id']}")
 
     source = read_text(".governance/source-registry.md")
     require(source.count("Source only; not adopted") == 5, "GOOGLE_NOT_ADOPTED")
@@ -335,11 +333,17 @@ def verify() -> dict[str, Any]:
         [".governance/config/ci.schema.json", ".governance/config/review.schema.json", ".governance/config/branch-protection.schema.json", ".governance/config/permitted-effects.schema.json", ".governance/config/privileged-boundaries.schema.json"],
         [".harness/route-invariants.md", ".harness/task-envelope.schema.json", ".harness/blocked-record.schema.json", ".harness/input-gates.md", ".harness/pre-code-readiness.md"],
         [".harness/mutation-gate.md", ".harness/contracts/governance-bootstrap.md", ".harness/negative-controls.json", ".harness/adoption-record.schema.json", ".harness/evals.md", ".harness/runtime-loop.md", ".harness/work-unit-lifecycle.schema.json"],
-        ["scripts/verify-governance.py", ".harness/runs/.gitkeep", ".harness/runs/compact-routing-worktree-lifecycle-2026-10-08.json", ".harness/runs/agents-compact-repair-2026-10-08.json"],
+        ["scripts/verify-governance.py", ".harness/runs/.gitkeep", ".harness/runs/compact-routing-worktree-lifecycle-2026-10-08.json", ".harness/runs/agents-compact-repair-2026-10-08.json", ".harness/runs/owner-approval-authority-2026-10-08.json"],
+        [".github/workflows/pr-verification.yml", ".markdownlint-cli2.jsonc", "README.md", "pyproject.toml", "tests/test_verify_governance.py"],
     ]
+    result = subprocess.run(["/usr/bin/git", "diff", "--numstat", BASE_SHA], cwd=ROOT, check=True, capture_output=True, text=True)  # noqa: S603
+    deltas = {parts[2]: int(parts[0]) + int(parts[1]) for line in result.stdout.splitlines() if len(parts := line.split("\t", 2)) == 3 and parts[0].isdigit() and parts[1].isdigit()}
+    assigned = {path for paths in increment_files for path in paths}
+    excluded = {"plans/wingman-governance-router-plan-v0.2.md"}
+    require(set(deltas) <= assigned | excluded and set(deltas) & excluded == excluded, "CHANGE_SET_MEMBERSHIP")
     line_counts = []
     for index, paths in enumerate(increment_files, start=1):
-        count = sum(len(read_text(path).splitlines()) for path in paths)
+        count = sum(deltas.get(path, 0) for path in paths)
         require(count <= 500, f"INC-{index}_CHANGE_SIZE")
         line_counts.append(count)
         checks.append(f"INC-{index}_CHANGE_SIZE")

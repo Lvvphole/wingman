@@ -8,6 +8,8 @@ The authenticated owner's direct instruction dated 2026-10-08, bound by SHA-256 
 
 The authenticated owner's defect report dated 2026-10-08, bound by SHA-256 `c70cfe82f00890c75cfe0ebf618375c887bbe5f0071a667e2ef8599bdf71ed54`, authorizes the bounded compact-root repair in construction contract SHA-256 `d544685b07a49901f7c1fb321e8621f1ef897a1182f07f9c8293d48762371249`.
 
+The authenticated owner's current instruction, bound by SHA-256 `6390a8ca3d1bdfb011a291d4b13315182aebc93cf40d274809eae7b84e74a6e0`, authorizes review-invariant changes, bounded verifier and test repair, PR-verification configuration repair, and evidence-bound replies and resolution for the current Codex review threads.
+
 ## Task envelope
 
 ```json
@@ -27,7 +29,7 @@ The authenticated owner's defect report dated 2026-10-08, bound by SHA-256 `c70c
   ],
   "workpiece_paths": ["README.md", "plans/wingman-governance-router-plan-v0.2.md"],
   "selected_evidence_ids": ["SCOUT-C92E695", "BASELINE-GOV-EVAL-43-FAIL"],
-  "authorized_candidate_paths": [".harness/", ".governance/", "AGENTS.md", "CLAUDE.md", "CONTEXT.md", "scripts/verify-governance.py"],
+  "authorized_candidate_paths": [".github/workflows/pr-verification.yml", ".harness/", ".governance/", ".markdownlint-cli2.jsonc", "AGENTS.md", "CLAUDE.md", "CONTEXT.md", "pyproject.toml", "scripts/verify-governance.py", "tests/"],
   "approvals": ["USER_DOMAIN_GOVERNANCE_BOOTSTRAP", "USER_LOC_CEILING_500", "USER_APPROVED_PLAN_EB45E338"],
   "source_binding": {
     "commit": "c92e695344f00fb30698cd494be4b8abf907e6ee",

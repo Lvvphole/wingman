@@ -30,7 +30,7 @@ The repository copy contains only the 53 rule statements and their activation co
 
 ## Bootstrap authority
 
-The greenfield creation of this control plane was authorized by approved plan SHA-256 `eb45e3381ead580cf41db4e2cbf1d6667dfb55d869c1208620caf7db5fa9905f` and its matching source binding. The current owner's direct instruction, SHA-256 `965d5788362bea1a6d75eb3200db3adcc74938f992d374719e4cf4cb84f0bfc5`, authorizes the bounded owner-authority correction. After creation, current on-disk governance must be read and cannot be replaced by the historical plan.
+The greenfield creation of this control plane was authorized by approved plan SHA-256 `eb45e3381ead580cf41db4e2cbf1d6667dfb55d869c1208620caf7db5fa9905f` and its matching source binding. Owner instruction SHA-256 `965d5788362bea1a6d75eb3200db3adcc74938f992d374719e4cf4cb84f0bfc5` authorized the bounded authority correction. Current owner instruction SHA-256 `6390a8ca3d1bdfb011a291d4b13315182aebc93cf40d274809eae7b84e74a6e0` authorizes review-invariant repair and evidence-bound handling of the current Codex findings. Current on-disk governance cannot be replaced by a historical plan.
 
 ## Non-authority
 

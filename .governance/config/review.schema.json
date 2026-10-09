@@ -3,7 +3,7 @@
   "$id": "wingman/governance/review-config/v1",
   "type": "object",
   "additionalProperties": false,
-  "required": ["mechanism", "maximum_cycles", "maximum_cycles_owner_approved", "scope", "reviewer_identity", "reviewer_independent", "first_cycle_requires_exact_head_ci", "later_cycles_require_evidence_and_ci", "unresolved_actionable_findings", "cycle_limit_result", "additional_cycle_authority", "carry_forward_rule", "merge_effect"],
+  "required": ["mechanism", "maximum_cycles", "maximum_cycles_owner_approved", "scope", "reviewer_identity", "reviewer_independent", "first_cycle_requires_exact_head_ci", "later_cycles_require_evidence_and_ci", "finding_response_policy", "repair_patch_net_code_lines_maximum", "unresolved_actionable_findings", "cycle_limit_result", "additional_cycle_authority", "carry_forward_rule", "merge_effect"],
   "properties": {
     "mechanism": {"enum": ["Codex", "human", "approved_independent_reviewer"]},
     "maximum_cycles": {"type": "integer", "const": 3},
@@ -13,6 +13,8 @@
     "reviewer_independent": {"const": true},
     "first_cycle_requires_exact_head_ci": {"const": true},
     "later_cycles_require_evidence_and_ci": {"const": true},
+    "finding_response_policy": {"const": "reply_with_disposition_fix_or_authority_evidence_verification_and_candidate_then_resolve"},
+    "repair_patch_net_code_lines_maximum": {"const": 0},
     "unresolved_actionable_findings": {"type": "integer", "const": 0},
     "cycle_limit_result": {"const": "BLOCKED"},
     "additional_cycle_authority": {"const": "explicit_owner_authorization"},

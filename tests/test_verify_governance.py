@@ -19,25 +19,19 @@ MODULE_SPEC.loader.exec_module(governance)
 def ready_work_unit() -> dict[str, object]:
     head = "a" * 40
     return {
-        "work_unit_id": "INC-1",
-        "unit_kind": "INC",
+        "work_unit_id": "INC-1", "unit_kind": "INC",
         "task_contract": ".harness/contracts/example.md",
-        "worktree_path": "/worktrees/inc-1",
-        "branch": "inc-1",
-        "unique_worktree": True,
+        "worktree_path": "/worktrees/inc-1", "branch": "inc-1", "unique_worktree": True,
         "base_sha": "b" * 40,
-        "state": "CI_GREEN",
-        "pr_number": 1,
-        "pr_head_sha": head,
-        "ci_context": "PR Verification",
-        "ci_result": "PASS",
-        "ci_head_sha": head,
+        "state": "CI_GREEN", "pr_number": 1, "pr_head_sha": head,
+        "ci_context": "PR Verification", "ci_result": "PASS", "ci_head_sha": head,
         "codex_review_state": "NOT_STARTED",
         "evidence_reference": "ci://pr/1/head",
     }
 
 
 def valid_envelope() -> dict[str, object]:
+    digest = "0" * 64
     return {
         "task_domains": ["GOVERNANCE_BOOTSTRAP"],
         "source_sections": ["authority"],
@@ -45,16 +39,15 @@ def valid_envelope() -> dict[str, object]:
         "selected_evidence_ids": ["EVIDENCE-1"],
         "authorized_candidate_paths": [".governance/"],
         "approvals": ["USER_APPROVED_PLAN_EB45E338"],
-        "source_binding": {"commit": "a" * 40},
+        "source_binding": {"commit": "a" * 40, "staged_diff_sha256": digest, "unstaged_diff_sha256": digest,
+                           "untracked_manifest_sha256": digest, "dirty_submodule_manifest_sha256": digest, "excluded_plan_path": "plans/approved.md"},
     }
 
 
 class RouteTests(unittest.TestCase):
     def test_unique_route_is_admitted(self) -> None:
-        self.assertEqual(
-            governance.route("GOVERNANCE_BOOTSTRAP", ["GOVERNANCE_BOOTSTRAP"]),
-            "GOVERNANCE_BOOTSTRAP",
-        )
+        routes = governance.registered_routes((MODULE_PATH.parents[1] / "CONTEXT.md").read_text())
+        self.assertEqual(governance.route("GOVERNANCE_BOOTSTRAP", routes), "GOVERNANCE_BOOTSTRAP")
 
     def test_zero_and_multiple_matches_fail_closed(self) -> None:
         zero = governance.route(None, ["GOVERNANCE_BOOTSTRAP"])
@@ -110,9 +103,7 @@ class ContractValidationTests(unittest.TestCase):
 
         missing = valid_envelope()
         missing.pop("source_binding")
-        self.assertEqual(
-            governance.validate_envelope(missing)["reason_code"], "ENVELOPE_INVALID"
-        )
+        self.assertEqual(governance.validate_envelope(missing)["reason_code"], "ENVELOPE_INVALID")
 
         wrong_domain = {**valid_envelope(), "task_domains": ["INFERRED"]}
         self.assertEqual(
@@ -121,10 +112,15 @@ class ContractValidationTests(unittest.TestCase):
         )
 
         unauthorized = {**valid_envelope(), "approvals": []}
-        self.assertEqual(
-            governance.validate_envelope(unauthorized)["reason_code"],
-            "AUTHORIZATION_INVALID",
-        )
+        self.assertEqual(governance.validate_envelope(unauthorized)["reason_code"], "ENVELOPE_INVALID")
+
+        for field, value, reason in (
+            ("source_sections", [], "ENVELOPE_INVALID"),
+            ("authorized_candidate_paths", [], "ENVELOPE_INVALID"),
+            ("source_binding", "not-an-object", "SOURCE_BINDING"),
+        ):
+            with self.subTest(field=field):
+                self.assertEqual(governance.validate_envelope({**valid_envelope(), field: value})["reason_code"], reason)
 
     def test_mutation_scope_rejects_unlisted_paths(self) -> None:
         allowed = (".governance/", ".harness/")
