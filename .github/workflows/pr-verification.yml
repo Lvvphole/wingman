@@ -13,13 +13,14 @@ concurrency:
   group: pr-verification-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+env:
+  CANDIDATE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+
 jobs:
-  verify:
-    name: PR Verification
+  lint:
+    name: Lint and static validation
     runs-on: ubuntu-24.04
     timeout-minutes: 5
-    env:
-      CANDIDATE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
     steps:
       - name: Check out the candidate head
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -33,10 +34,79 @@ jobs:
           python-version: "3.13.14"
 
       - name: Bind the checkout to the candidate head
+        run: test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
+
+      - name: Lint Python
+        uses: astral-sh/ruff-action@4919ec5cf1f49eff0871dbcea0da843445b837e6 # v3
+        with:
+          version: "0.16.10"
+          args: "check --output-format=github"
+
+      - name: Lint Markdown
+        uses: DavidAnson/markdownlint-cli2-action@992badcdf24e3b8eb7e87ff9287fe931bcb00c6e # v20
+        with:
+          config: ".markdownlint-cli2.jsonc"
+          globs: |
+            **/*.md
+
+      - name: Compile Python
+        run: python3 -m compileall -q scripts tests
+
+      - name: Parse JSON and TOML
         shell: bash
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
+          python3 - <<'PY'
+          import json
+          import tomllib
+          from pathlib import Path
+
+          for path in sorted(Path(".").rglob("*.json")):
+              json.loads(path.read_text(encoding="utf-8"))
+          with Path("pyproject.toml").open("rb") as stream:
+              tomllib.load(stream)
+          PY
+
+  unit-tests:
+    name: Unit tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Check out the candidate head
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ env.CANDIDATE_SHA }}
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: "3.13.14"
+
+      - name: Bind the checkout to the candidate head
+        run: test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
+
+      - name: Run unit tests
+        run: python3 -m unittest discover -s tests -p 'test_*.py' -v
+
+  governance:
+    name: Governance verification
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Check out the candidate head
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ env.CANDIDATE_SHA }}
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: "3.13.14"
+
+      - name: Bind the checkout to the candidate head
+        run: test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
 
       - name: Run deterministic governance verification twice
         shell: bash
@@ -46,3 +116,18 @@ jobs:
           python3 scripts/verify-governance.py | tee /tmp/governance-pass-2.json
           cmp /tmp/governance-pass-1.json /tmp/governance-pass-2.json
           git diff --exit-code
+
+  result:
+    name: PR Verification
+    if: ${{ always() }}
+    needs: [lint, unit-tests, governance]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - name: Require every verification job to pass
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${{ needs.lint.result }}" = "success"
+          test "${{ needs.unit-tests.result }}" = "success"
+          test "${{ needs.governance.result }}" = "success"
