@@ -134,9 +134,16 @@ def allowed(path: str, rules: list[str]) -> bool:
     return any(path.startswith(rule) if rule.endswith("/") else path == rule for rule in rules)
 
 
+def verify_manifest(root: Path, measured: dict[str, int], manifest: dict[str, str]) -> None:
+    require(set(measured) == set(manifest), "CONTENT_MANIFEST_COVERAGE")
+    for path, expected in manifest.items():
+        require(digest(root, path) == expected, f"CONTENT_BINDING:{path}")
+
+
 def verify(candidate: Path, contract_path: Path, repository: str, head_repository: str, base: str, head: str, pr: int, branch: str) -> dict[str, Any]:
     candidate = candidate.resolve(strict=True)
     contract = json.loads(contract_path.read_text(encoding="utf-8"))
+    require(contract.get("admission_enabled") is True, "ADMISSION_DISABLED")
     require(repository == contract["repository"], "REPOSITORY_IDENTITY")
     require(head_repository == repository, "HEAD_REPOSITORY_IDENTITY")
     require(branch == contract["work_unit"]["branch"], "BRANCH_IDENTITY")
@@ -164,6 +171,7 @@ def verify(candidate: Path, contract_path: Path, repository: str, head_repositor
     require(all(allowed(path, authorized_paths) for path in measured), "MUTATION_SCOPE")
     assigned = {path for increment in contract["increments"] for path in increment}
     require(set(measured) <= assigned, "INCREMENT_MEMBERSHIP")
+    verify_manifest(candidate, measured, contract["required_file_sha256"])
     counts = [sum(measured.get(path, 0) for path in increment) for increment in contract["increments"]]
     require(all(count <= contract["maximum_increment_lines"] for count in counts), "CHANGE_SIZE")
 
