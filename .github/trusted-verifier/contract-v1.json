@@ -26,7 +26,7 @@
     [".harness/route-invariants.md", ".harness/task-envelope.schema.json", ".harness/blocked-record.schema.json", ".harness/input-gates.md", ".harness/pre-code-readiness.md"],
     [".harness/mutation-gate.md", ".harness/contracts/governance-bootstrap.md", ".harness/negative-controls.json", ".harness/adoption-record.schema.json", ".harness/evals.md", ".harness/runtime-loop.md", ".harness/work-unit-lifecycle.schema.json"],
     ["scripts/verify-governance.py", ".harness/runs/.gitkeep", ".harness/runs/compact-routing-worktree-lifecycle-2026-10-08.json", ".harness/runs/agents-compact-repair-2026-10-08.json", ".harness/runs/owner-approval-authority-2026-10-08.json"],
-    [".github/workflows/pr-verification.yml", ".markdownlint-cli2.jsonc", "README.md", "pyproject.toml", "tests/test_verify_governance.py"]
+    [".github/workflows/pr-verification.yml", ".markdownlint-cli2.jsonc", "pyproject.toml", "tests/test_verify_governance.py"]
   ],
   "maximum_increment_lines": 500,
   "work_unit": {"work_unit_id": "SPRINT-GOVERNANCE-BOOTSTRAP", "unit_kind": "SPRINT", "task_contract": ".harness/contracts/governance-bootstrap.md", "worktree_path": "/workspace/scratch/99e6ff3f9161/wingman-bootstrap-delivery", "branch": "governance/bootstrap-delivery", "unique_worktree": true}
