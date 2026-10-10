@@ -1,0 +1,7 @@
+{
+  "version": "1.0",
+  "repository": "Lvvphole/wingman",
+  "target_branch": "main",
+  "admission_enabled": false,
+  "required_file_sha256": {}
+}
