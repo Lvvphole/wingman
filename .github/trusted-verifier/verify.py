@@ -137,7 +137,8 @@ def allowed(path: str, rules: list[str]) -> bool:
 def verify_manifest(root: Path, measured: dict[str, int], manifest: dict[str, str]) -> None:
     require(set(measured) == set(manifest), "CONTENT_MANIFEST_COVERAGE")
     for path, expected in manifest.items():
-        require(digest(root, path) == expected, f"CONTENT_BINDING:{path}")
+        mode = git_output(root, "ls-tree", "HEAD", "--", path).split()[0]
+        require(f"{mode}:{digest(root, path)}" == expected, f"CONTENT_BINDING:{path}")
 
 
 def verify(candidate: Path, contract_path: Path, repository: str, head_repository: str, base: str, head: str, pr: int, branch: str) -> dict[str, Any]:
