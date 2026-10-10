@@ -30,8 +30,9 @@ def safe_bytes(root: Path, relative: str) -> bytes:
     return resolved.read_bytes()
 
 
-def digest(root: Path, relative: str) -> str:
-    return hashlib.sha256(safe_bytes(root, relative)).hexdigest()
+def digest(root: Path, relative: str, bind_mode: bool = False) -> str:
+    value = hashlib.sha256(safe_bytes(root, relative)).hexdigest()
+    return f"{git_output(root, 'ls-tree', 'HEAD', '--', relative).split()[0]}:{value}" if bind_mode else value
 
 
 def load_json(root: Path, relative: str) -> dict[str, Any]:
@@ -137,8 +138,7 @@ def allowed(path: str, rules: list[str]) -> bool:
 def verify_manifest(root: Path, measured: dict[str, int], manifest: dict[str, str]) -> None:
     require(set(measured) == set(manifest), "CONTENT_MANIFEST_COVERAGE")
     for path, expected in manifest.items():
-        mode = git_output(root, "ls-tree", "HEAD", "--", path).split()[0]
-        require(f"{mode}:{digest(root, path)}" == expected, f"CONTENT_BINDING:{path}")
+        require(digest(root, path, bind_mode=True) == expected, f"CONTENT_BINDING:{path}")
 
 
 def verify(candidate: Path, contract_path: Path, repository: str, head_repository: str, base: str, head: str, pr: int, branch: str) -> dict[str, Any]:
@@ -167,7 +167,7 @@ def verify(candidate: Path, contract_path: Path, repository: str, head_repositor
 
     deltas = changed_lines(candidate, base, head)
     for path, expected in exempt_files.items():
-        require(path in deltas and digest(candidate, path) == expected, f"EXEMPT_FILE:{path}")
+        require(path in deltas and digest(candidate, path, bind_mode=True) == expected, f"EXEMPT_FILE:{path}")
     measured = {path: count for path, count in deltas.items() if path not in exempt_files}
     require(all(allowed(path, authorized_paths) for path in measured), "MUTATION_SCOPE")
     assigned = {path for increment in contract["increments"] for path in increment}
