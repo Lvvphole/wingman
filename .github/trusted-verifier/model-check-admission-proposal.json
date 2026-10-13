@@ -1,0 +1,28 @@
+{
+  "version": "1.0",
+  "repository": "Lvvphole/wingman",
+  "target_branch": "main",
+  "admission_enabled": false,
+  "required_file_sha256": {},
+  "proposed_work_unit": {
+    "branch": "verification/prd-model-gate-v02",
+    "route": "MODEL_CHECK_VERIFICATION",
+    "authorized_candidate_paths": ["verification/prd_model.py", "verification/test_prd_model.py"],
+    "original_base_sha": "7919a77437c9ff6f80e606649582627f461a6674",
+    "candidate_head_sha_at_review": "51455b32e6fe163ca8395685b7a9db9ef0106332",
+    "candidate_file_sha256": {
+      "verification/prd_model.py": "PENDING_BYTE_VERIFICATION",
+      "verification/test_prd_model.py": "PENDING_BYTE_VERIFICATION"
+    },
+    "task_envelope_schema": "PENDING",
+    "lifecycle_schema": "PENDING",
+    "task_contract": "PENDING",
+    "source_registry": "PENDING",
+    "fixed_sources": "PENDING",
+    "required_approvals": "PENDING",
+    "size_exempt_files": "PENDING",
+    "increments": [["verification/prd_model.py"], ["verification/test_prd_model.py"]],
+    "maximum_increment_lines": 200,
+    "review_status": "NOT_AUTHORIZED_FOR_ADMISSION"
+  }
+}
