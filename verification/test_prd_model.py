@@ -22,6 +22,12 @@ class PRDModelTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     transition(edge)
 
+    def test_no_unapproved_self_transitions(self):
+        for state in STATES:
+            for event in ("RECIPROCAL_INTERACTION", "VALID_CLOSURE", "INTIMACY", "GOAL_CHANGE"):
+                with self.subTest(state=state, event=event), self.assertRaisesRegex(ValueError, "UNAUTHORIZED_TRANSITION"):
+                    transition(Edge(state, event, state, "RESOLVER"))
+
     def test_reopen_confirmation_and_actor(self):
         for target in ACTIVE:
             with self.assertRaises(ValueError):
