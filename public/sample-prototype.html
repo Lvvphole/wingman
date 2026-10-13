@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tempo – Daily Three</title>
+<style>
+  :root { --bg:#0e0e10; --card:#1b1b1f; --ink:#f4f4f5; --mute:#9a9aa3; --a:#ff7a45; --b:#7c5cff; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.45 system-ui,-apple-system,sans-serif; min-height:100vh; }
+  .screen { display:none; padding:56px 18px 90px; } .screen.on { display:block; }
+  h1 { font-size:22px; margin:0 0 18px; } h2 { font-size:16px; margin:22px 0 10px; }
+  .hero { border-radius:18px; padding:18px; background:linear-gradient(135deg,var(--a),var(--b)); cursor:pointer; }
+  .hero small { font-weight:700; letter-spacing:.08em; font-size:11px; opacity:.9; }
+  .hero b { display:block; font-size:24px; margin:8px 0 2px; }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .tile { background:var(--card); border-radius:10px; padding:12px; color:var(--mute); font-size:13px; }
+  .track { display:flex; gap:12px; align-items:flex-start; background:var(--card); border-radius:14px; padding:12px; margin-bottom:10px; }
+  .art { flex:none; width:52px; height:52px; border-radius:10px; }
+  .why { color:var(--mute); font-size:13px; margin-top:4px; }
+  .row { display:flex; gap:10px; margin-top:18px; }
+  button { font:inherit; border:0; border-radius:999px; padding:12px 18px; font-weight:700; cursor:pointer; }
+  .play { background:var(--ink); color:#000; flex:1; } .share { background:var(--card); color:var(--ink); }
+  .back { background:none; color:var(--mute); padding:0; margin-bottom:14px; }
+  .toast { position:fixed; left:18px; right:18px; bottom:24px; background:var(--card); padding:14px; border-radius:12px; display:none; }
+</style>
+</head>
+<body>
+<!-- Sample prototype for Wingman Lab. Steps are reported with parent.postMessage({type:'lab:step', step:n}, '*'). -->
+<section class="screen on" id="home">
+  <h1>Good evening</h1>
+  <div class="hero" id="open">
+    <small>✦ DAILY THREE · NEW TODAY</small>
+    <b>Night Drive</b>
+    <span>3 songs picked for your late nights</span>
+  </div>
+  <h2>Recently played</h2>
+  <div class="grid"><div class="tile">Focus Mix</div><div class="tile">Morning Run</div><div class="tile">Lo-fi Rain</div><div class="tile">Weekend Soul</div></div>
+</section>
+
+<section class="screen" id="blitz">
+  <button class="back" id="back">‹ Home</button>
+  <h1>Night Drive</h1>
+  <p class="why" id="reason" style="cursor:pointer">You played slow, synth-heavy songs after 10 pm this week. <u>Why these songs?</u></p>
+  <div id="tracks"></div>
+  <div class="row"><button class="play" id="play">▶ Play all</button><button class="share" id="share">Share</button></div>
+</section>
+<div class="toast" id="toast"></div>
+
+<script>
+  const step = (n) => parent.postMessage({ type: 'lab:step', step: n }, '*');
+  const tracks = [
+    ['Neon Harbor', 'Glass Fields', 'Matches the tempo of songs you replayed on Tuesday.', '#ff7a45,#7c5cff'],
+    ['Low Tide Radio', 'Mira Vale', 'New this week from a producer you follow.', '#2dd4bf,#3b82f6'],
+    ['Slow Static', 'The Quiet Hours', 'Listeners with your taste saved it 3x more this month.', '#f472b6,#a855f7'],
+  ];
+  document.getElementById('tracks').innerHTML = tracks.map(([t, a, w, g]) =>
+    `<div class="track"><div class="art" style="background:linear-gradient(135deg,${g})"></div><div><b>${t}</b><div style="color:var(--mute);font-size:13px">${a}</div><div class="why">${w}</div></div></div>`).join('');
+  const show = (id) => document.querySelectorAll('.screen').forEach((s) => s.classList.toggle('on', s.id === id));
+  const toast = (m) => { const t = document.getElementById('toast'); t.textContent = m; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 1800); };
+  document.getElementById('open').onclick = () => { show('blitz'); step(1); setTimeout(() => step(3), 2500); };
+  document.getElementById('reason').onclick = () => { step(2); toast('Picked from your late-night listening this week.'); };
+  document.getElementById('back').onclick = () => show('home');
+  document.getElementById('play').onclick = () => { step(4); toast('Playing Night Drive'); };
+  document.getElementById('share').onclick = () => { step(4); toast('Link copied'); };
+</script>
+</body>
+</html>
