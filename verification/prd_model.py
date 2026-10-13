@@ -29,8 +29,6 @@ def transition(edge: Edge) -> str:
         raise ValueError("UNKNOWN_STATE")
     if edge.actor != "RESOLVER":
         raise ValueError("UNAUTHORIZED_MUTATION")
-    if edge.source == edge.target:
-        return edge.target
     if edge.source == "NEW" and edge.target == "TALKING":
         if edge.event == "RECIPROCAL_INTERACTION":
             return edge.target
