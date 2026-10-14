@@ -161,6 +161,7 @@ def verify(candidate: Path, contract_path: Path, repository: str, head_repositor
     require(head_repository == repository, "HEAD_REPOSITORY_IDENTITY")
     require(branch == contract["work_unit"]["branch"], "BRANCH_IDENTITY")
     require(re.fullmatch(r"[0-9a-f]{40}", base) is not None and re.fullmatch(r"[0-9a-f]{40}", head) is not None, "SHA_FORMAT")
+    require(head == contract["authorized_head_sha"], "AUTHORIZED_HEAD_IDENTITY")
     require(git_output(candidate, "rev-parse", "HEAD").strip() == head, "HEAD_IDENTITY")
     require_ancestor(candidate, contract["original_base_sha"], head)
     authorized_paths = contract["authorized_candidate_paths"]

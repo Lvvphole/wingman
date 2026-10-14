@@ -32,6 +32,19 @@ class TrustedVerifierTests(unittest.TestCase):
             with self.assertRaises(json.JSONDecodeError):
                 VERIFY.task_envelope(root, "contract.md")
 
+    def test_candidate_head_must_equal_authorized_head(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            contract = root / "contract.json"
+            contract.write_text(json.dumps({
+                "admission_enabled": True,
+                "repository": "repo",
+                "authorized_head_sha": "c" * 40,
+                "work_unit": {"branch": "branch"}
+            }), encoding="utf-8")
+            with self.assertRaisesRegex(VERIFY.Failure, "AUTHORIZED_HEAD_IDENTITY"):
+                VERIFY.verify(root, contract, "repo", "repo", "a" * 40, "b" * 40, 1, "branch")
+
     def test_original_base_must_be_candidate_ancestor(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
