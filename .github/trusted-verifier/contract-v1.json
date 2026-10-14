@@ -4,7 +4,7 @@
   "target_branch": "main",
   "admission_enabled": true,
   "original_base_sha": "7919a77437c9ff6f80e606649582627f461a6674",
-  "authorized_head_sha": "5412374086b4fcd649244f2febc9de1586a182a3",
+  "authorized_head_sha": "fb0120d36777ad923518cfae7e4c770d595eb03d",
   "route": "PRD_MODEL_VERIFICATION",
   "required_approvals": ["OWNER_AUTHORIZED_VERIFICATION_COMPLETION"],
   "authorized_candidate_paths": [
