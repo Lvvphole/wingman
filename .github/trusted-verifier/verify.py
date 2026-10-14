@@ -149,6 +149,7 @@ def verify(candidate: Path, contract_path: Path, repository: str, head_repositor
     require(head_repository == repository, "HEAD_REPOSITORY_IDENTITY")
     require(branch == contract["work_unit"]["branch"], "BRANCH_IDENTITY")
     require(re.fullmatch(r"[0-9a-f]{40}", base) is not None and re.fullmatch(r"[0-9a-f]{40}", head) is not None, "SHA_FORMAT")
+    require(base == contract["original_base_sha"], "BASE_IDENTITY")
     require(git_output(candidate, "rev-parse", "HEAD").strip() == head, "HEAD_IDENTITY")
     authorized_paths = contract["authorized_candidate_paths"]
     exempt_files = contract["size_exempt_files"]
@@ -165,7 +166,7 @@ def verify(candidate: Path, contract_path: Path, repository: str, head_repositor
 
     verify_sources(candidate, contract["source_registry"], contract["fixed_sources"])
 
-    deltas = changed_lines(candidate, base, head)
+    deltas = changed_lines(candidate, contract["original_base_sha"], head)
     for path, expected in exempt_files.items():
         require(path in deltas and digest(candidate, path, bind_mode=True) == expected, f"EXEMPT_FILE:{path}")
     measured = {path: count for path, count in deltas.items() if path not in exempt_files}
