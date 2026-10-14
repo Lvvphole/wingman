@@ -1,7 +1,86 @@
 {
-  "version": "1.0",
+  "version": "1.1",
   "repository": "Lvvphole/wingman",
   "target_branch": "main",
-  "admission_enabled": false,
-  "required_file_sha256": {}
+  "admission_enabled": true,
+  "original_base_sha": "7919a77437c9ff6f80e606649582627f461a6674",
+  "route": "ICM_BOOTSTRAP",
+  "required_approvals": ["OWNER_AUTHORIZED_ICM_BOOTSTRAP"],
+  "authorized_candidate_paths": [
+    "AGENTS.md",
+    "CLAUDE.md",
+    "CONTEXT.md",
+    ".governance/engineering-rules.md",
+    ".governance/system-design-standard.md",
+    ".governance/source-registry.md",
+    ".harness/task-envelope.schema.json",
+    ".harness/work-unit-lifecycle.schema.json",
+    ".harness/contracts/icm-bootstrap.md"
+  ],
+  "work_unit": {
+    "id": "INC-ICM-BOOTSTRAP-V1",
+    "kind": "INC",
+    "branch": "inc/icm-bootstrap-v1",
+    "isolated_worktree": true
+  },
+  "task_contract": ".harness/contracts/icm-bootstrap.md",
+  "task_envelope_schema": {
+    "path": ".harness/task-envelope.schema.json",
+    "sha256": "d82c02df675a4d0ba2c2fe01e43acf1adb4c13fa08117fac91846a4248e4b090"
+  },
+  "lifecycle_schema": {
+    "path": ".harness/work-unit-lifecycle.schema.json",
+    "sha256": "3739e07b5daa5dbe0584ba9f793193ec6972c45591ad84c3a6316288f2e9c029"
+  },
+  "source_registry": ".governance/source-registry.md",
+  "fixed_sources": [
+    {
+      "id": "DESIGN_AUTHORITY",
+      "kind": "external",
+      "locator": "library://libfile_530985d4329c8191bf8b92bd8004e5ab",
+      "binding": "7f427fbb3d9aa05c3f3136dd82e57973920b5b8318d7063c6749847ca12b77f6"
+    },
+    {
+      "id": "PRODUCT_PRD",
+      "kind": "external",
+      "locator": "library://libfile_b655727992f8819192e9889c29dacd63",
+      "binding": "a0283859f2b128c9ef0adcb25922901e135e0aeed64ba42900d8b83701f48be1"
+    },
+    {
+      "id": "ENGINEERING_RULES",
+      "kind": "local",
+      "locator": ".governance/engineering-rules.md",
+      "binding": "46249019e7a1c0cb219494f8bd7a6a8984ff471761b80ff0e1a1f0c297ff62dd"
+    },
+    {
+      "id": "SYSTEM_DESIGN_STANDARD",
+      "kind": "local",
+      "locator": ".governance/system-design-standard.md",
+      "binding": "9615b790dad7efb8a9b776d1de4e500d508c7f6d2ffe447c3352a66e82342992"
+    }
+  ],
+  "maximum_increment_lines": 500,
+  "increments": [[
+    "AGENTS.md",
+    "CLAUDE.md",
+    "CONTEXT.md",
+    ".governance/engineering-rules.md",
+    ".governance/system-design-standard.md",
+    ".governance/source-registry.md",
+    ".harness/task-envelope.schema.json",
+    ".harness/work-unit-lifecycle.schema.json"
+  ]],
+  "size_exempt_files": {
+    ".harness/contracts/icm-bootstrap.md": "100644:f047120503fee2afc6bafa90550eb6261f32bbe042ac07828f0124543ff67a9a"
+  },
+  "required_file_sha256": {
+    "AGENTS.md": "100644:f7549d8c987222764c4479acb749c592941a4b60dcc6ff57d97d67ad777aa862",
+    "CLAUDE.md": "100644:eafc5b2bc206bad7f1531fb52be93c4615339b2a0d478eeb34e41263c25a729f",
+    "CONTEXT.md": "100644:f6af1b54a2f4ca0678bad0eb54e14410a9e694e756c1ba2fc105bcc77fca37aa",
+    ".governance/engineering-rules.md": "100644:46249019e7a1c0cb219494f8bd7a6a8984ff471761b80ff0e1a1f0c297ff62dd",
+    ".governance/system-design-standard.md": "100644:9615b790dad7efb8a9b776d1de4e500d508c7f6d2ffe447c3352a66e82342992",
+    ".governance/source-registry.md": "100644:9a35173b8b76fb77eb316df94c5a3e60bc41c737d686608718137dd8668b910b",
+    ".harness/task-envelope.schema.json": "100644:d82c02df675a4d0ba2c2fe01e43acf1adb4c13fa08117fac91846a4248e4b090",
+    ".harness/work-unit-lifecycle.schema.json": "100644:3739e07b5daa5dbe0584ba9f793193ec6972c45591ad84c3a6316288f2e9c029"
+  }
 }

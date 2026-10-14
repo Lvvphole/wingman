@@ -42,6 +42,19 @@ jobs:
       - name: Test protected-base verifier
         run: python3 -m unittest discover -s trusted/.github/trusted-verifier -p 'test_*.py' -v
 
+      - name: Compile protected-base verifier
+        run: python3 -m compileall -q trusted/.github/trusted-verifier
+
+      - name: Lint exact candidate as data
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          python3 trusted/.github/trusted-verifier/lint_candidate.py \
+            --candidate candidate \
+            --base-sha "$BASE_SHA" \
+            --head-sha "$HEAD_SHA"
+
       - name: Verify candidate without executing it
         shell: bash
         env:
