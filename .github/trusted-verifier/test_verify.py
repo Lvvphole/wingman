@@ -32,6 +32,36 @@ class TrustedVerifierTests(unittest.TestCase):
             with self.assertRaises(json.JSONDecodeError):
                 VERIFY.task_envelope(root, "contract.md")
 
+    def test_candidate_head_must_equal_authorized_head(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            contract = root / "contract.json"
+            contract.write_text(json.dumps({
+                "admission_enabled": True,
+                "repository": "repo",
+                "authorized_head_sha": "c" * 40,
+                "work_unit": {"branch": "branch"}
+            }), encoding="utf-8")
+            with self.assertRaisesRegex(VERIFY.Failure, "AUTHORIZED_HEAD_IDENTITY"):
+                VERIFY.verify(root, contract, "repo", "repo", "a" * 40, "b" * 40, 1, "branch")
+
+    def test_original_base_must_be_candidate_ancestor(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+            subprocess.run(["git", "config", "user.email", "test@example.com"], cwd=root, check=True)
+            subprocess.run(["git", "config", "user.name", "Test"], cwd=root, check=True)
+            (root / "file").write_text("base\n", encoding="utf-8")
+            subprocess.run(["git", "add", "file"], cwd=root, check=True)
+            subprocess.run(["git", "commit", "-qm", "base"], cwd=root, check=True)
+            base = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True).strip()
+            (root / "file").write_text("head\n", encoding="utf-8")
+            subprocess.run(["git", "commit", "-qam", "head"], cwd=root, check=True)
+            head = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True).strip()
+            VERIFY.require_ancestor(root, base, head)
+            with self.assertRaisesRegex(VERIFY.Failure, "ORIGINAL_BASE_ANCESTRY"):
+                VERIFY.require_ancestor(root, head, base)
+
     def test_source_binding_checks_actual_local_bytes(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

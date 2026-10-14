@@ -1,7 +1,68 @@
 {
-  "version": "1.0",
+  "version": "1.1",
   "repository": "Lvvphole/wingman",
   "target_branch": "main",
-  "admission_enabled": false,
-  "required_file_sha256": {}
+  "admission_enabled": true,
+  "original_base_sha": "7919a77437c9ff6f80e606649582627f461a6674",
+  "authorized_head_sha": "fb0120d36777ad923518cfae7e4c770d595eb03d",
+  "route": "PRD_MODEL_VERIFICATION",
+  "required_approvals": ["OWNER_AUTHORIZED_VERIFICATION_COMPLETION"],
+  "authorized_candidate_paths": [
+    "verification/prd_model.py",
+    "verification/test_prd_model.py",
+    ".harness/task-envelope.schema.json",
+    ".harness/work-unit-lifecycle.schema.json",
+    ".governance/source-registry.md",
+    ".harness/contracts/prd-model-verification.md"
+  ],
+  "work_unit": {
+    "work_unit_id": "INC-PRD-MODEL-VERIFICATION-V02",
+    "unit_kind": "INC",
+    "task_contract": ".harness/contracts/prd-model-verification.md",
+    "worktree_path": "worktrees/prd-model-verification-v02",
+    "branch": "verification/prd-model-gate-v02",
+    "unique_worktree": true
+  },
+  "task_contract": ".harness/contracts/prd-model-verification.md",
+  "task_envelope_schema": {
+    "path": ".harness/task-envelope.schema.json",
+    "sha256": "011b10065814c8de383a2bff2857a34411b031c52130e674b715c5d8899c7edd"
+  },
+  "lifecycle_schema": {
+    "path": ".harness/work-unit-lifecycle.schema.json",
+    "sha256": "ba661525e77c552a0ec912a0afc94999b87c5b3792ec89f501bb938fe221ca44"
+  },
+  "source_registry": ".governance/source-registry.md",
+  "fixed_sources": [
+    {
+      "id": "DESIGN_AUTHORITY",
+      "kind": "external",
+      "locator": "library://libfile_530985d4329c8191bf8b92bd8004e5ab",
+      "binding": "7f427fbb3d9aa05c3f3136dd82e57973920b5b8318d7063c6749847ca12b77f6"
+    },
+    {
+      "id": "PRODUCT_PRD",
+      "kind": "external",
+      "locator": "library://libfile_b655727992f8819192e9889c29dacd63",
+      "binding": "a0283859f2b128c9ef0adcb25922901e135e0aeed64ba42900d8b83701f48be1"
+    }
+  ],
+  "maximum_increment_lines": 500,
+  "increments": [[
+    "verification/prd_model.py",
+    "verification/test_prd_model.py",
+    ".harness/task-envelope.schema.json",
+    ".harness/work-unit-lifecycle.schema.json",
+    ".governance/source-registry.md"
+  ]],
+  "size_exempt_files": {
+    ".harness/contracts/prd-model-verification.md": "100644:6191b1a48d3208c830d70567d0db6b597b1f810437f616c9d0048da7ee5c6432"
+  },
+  "required_file_sha256": {
+    "verification/prd_model.py": "100644:46cddc01e0a1a3eba92e53c58a694ae9ac47ad34d1c3e292bbabcd5453d645c1",
+    "verification/test_prd_model.py": "100644:95fe38389ca2db97051005a32e96558a94fbdff5554ecee1bcfa4015f5907a7b",
+    ".harness/task-envelope.schema.json": "100644:011b10065814c8de383a2bff2857a34411b031c52130e674b715c5d8899c7edd",
+    ".harness/work-unit-lifecycle.schema.json": "100644:ba661525e77c552a0ec912a0afc94999b87c5b3792ec89f501bb938fe221ca44",
+    ".governance/source-registry.md": "100644:c3c0ee030366f992e0fd848ed484b0c9fd463e0cb864eece0f803b1a8f002c21"
+  }
 }

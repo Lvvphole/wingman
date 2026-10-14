@@ -42,6 +42,9 @@ jobs:
       - name: Test protected-base verifier
         run: python3 -m unittest discover -s trusted/.github/trusted-verifier -p 'test_*.py' -v
 
+      - name: Compile protected-base verifier
+        run: python3 -m compileall -q trusted/.github/trusted-verifier
+
       - name: Verify candidate without executing it
         shell: bash
         env:
