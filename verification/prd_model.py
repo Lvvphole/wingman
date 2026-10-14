@@ -47,12 +47,14 @@ def transition(edge: Edge) -> str:
 def route_accepted(*, served_model: str, accepted_model: str,
                    served_provider: str, accepted_providers: frozenset[str],
                    zdr: bool, no_training: bool, metadata_complete: bool,
-                   route_digest: str, accepted_digest: str) -> bool:
+                   route_digest: str, accepted_digest: str,
+                   gateway_bypassed: bool) -> bool:
     return (bool(served_model) and served_model == accepted_model
             and served_provider in accepted_providers
             and zdr is True and no_training is True
             and metadata_complete is True and bool(route_digest)
-            and route_digest == accepted_digest)
+            and route_digest == accepted_digest
+            and gateway_bypassed is False)
 
 
 def episode_reusable(*, hash_equal: bool, status: str,
@@ -72,6 +74,12 @@ def may_commit(*, actor: str, deletion_in_progress: bool,
                confirmation_required: bool) -> bool:
     return (actor == "RESOLVER" and not deletion_in_progress and lease_valid
             and (not confirmation_required or user_confirmed))
+
+
+def intimacy_action_feasible(*, current_consent: bool,
+                             boundary_blocked: bool) -> bool:
+    """Apply current consent and boundary constraints without inference."""
+    return current_consent is True and boundary_blocked is False
 
 
 def model_check() -> dict[str, object]:

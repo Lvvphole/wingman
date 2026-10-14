@@ -1,6 +1,6 @@
 import itertools
 import unittest
-from verification.prd_model import ACTIVE, Edge, STATES, transition, route_accepted, episode_reusable, effective_capabilities, may_commit, model_check
+from verification.prd_model import ACTIVE, Edge, STATES, transition, route_accepted, episode_reusable, effective_capabilities, intimacy_action_feasible, may_commit, model_check
 
 class PRDModelTests(unittest.TestCase):
     def test_model(self):
@@ -38,9 +38,9 @@ class PRDModelTests(unittest.TestCase):
                 transition(Edge("NEW", "RECIPROCAL_INTERACTION", "TALKING", actor))
 
     def test_route_mutation_controls(self):
-        valid = dict(served_model="m", accepted_model="m", served_provider="p", accepted_providers=frozenset({"p"}), zdr=True, no_training=True, metadata_complete=True, route_digest="d", accepted_digest="d")
+        valid = dict(served_model="m", accepted_model="m", served_provider="p", accepted_providers=frozenset({"p"}), zdr=True, no_training=True, metadata_complete=True, route_digest="d", accepted_digest="d", gateway_bypassed=False)
         self.assertTrue(route_accepted(**valid))
-        for key, value in dict(served_model="x", served_provider="x", zdr=False, no_training=False, metadata_complete=False, route_digest="x").items():
+        for key, value in dict(served_model="x", served_provider="x", zdr=False, no_training=False, metadata_complete=False, route_digest="x", gateway_bypassed=True).items():
             self.assertFalse(route_accepted(**{**valid, key: value}), key)
 
     def test_reuse_truth_table(self):
@@ -57,6 +57,11 @@ class PRDModelTests(unittest.TestCase):
         for actor, deletion, lease, confirmed, required in itertools.product(("RESOLVER", "JEV"), (False, True), (False, True), (False, True), (False, True)):
             expected = actor == "RESOLVER" and not deletion and lease and (not required or confirmed)
             self.assertEqual(may_commit(actor=actor, deletion_in_progress=deletion, lease_valid=lease, user_confirmed=confirmed, confirmation_required=required), expected)
+
+    def test_intimacy_requires_current_consent_and_clear_boundary(self):
+        for current_consent, boundary_blocked in itertools.product((False, True), repeat=2):
+            expected = current_consent and not boundary_blocked
+            self.assertEqual(intimacy_action_feasible(current_consent=current_consent, boundary_blocked=boundary_blocked), expected)
 
 if __name__ == "__main__":
     unittest.main()
