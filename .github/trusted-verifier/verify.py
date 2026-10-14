@@ -131,6 +131,18 @@ def changed_lines(root: Path, base: str, head: str) -> dict[str, int]:
     return rows
 
 
+def require_ancestor(root: Path, ancestor: str, descendant: str) -> None:
+    result = subprocess.run(
+        ["/usr/bin/git", "merge-base", "--is-ancestor", ancestor, descendant],
+        cwd=root,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    require(result.returncode in {0, 1}, f"GIT:merge-base:{result.stderr.strip()}")
+    require(result.returncode == 0, "ORIGINAL_BASE_ANCESTRY")
+
+
 def allowed(path: str, rules: list[str]) -> bool:
     return any(path.startswith(rule) if rule.endswith("/") else path == rule for rule in rules)
 
@@ -149,8 +161,8 @@ def verify(candidate: Path, contract_path: Path, repository: str, head_repositor
     require(head_repository == repository, "HEAD_REPOSITORY_IDENTITY")
     require(branch == contract["work_unit"]["branch"], "BRANCH_IDENTITY")
     require(re.fullmatch(r"[0-9a-f]{40}", base) is not None and re.fullmatch(r"[0-9a-f]{40}", head) is not None, "SHA_FORMAT")
-    require(base == contract["original_base_sha"], "BASE_IDENTITY")
     require(git_output(candidate, "rev-parse", "HEAD").strip() == head, "HEAD_IDENTITY")
+    require_ancestor(candidate, contract["original_base_sha"], head)
     authorized_paths = contract["authorized_candidate_paths"]
     exempt_files = contract["size_exempt_files"]
 
@@ -179,12 +191,13 @@ def verify(candidate: Path, contract_path: Path, repository: str, head_repositor
 
     lifecycle_schema = load_json(candidate, contract["lifecycle_schema"]["path"])
     require(digest(candidate, contract["lifecycle_schema"]["path"]) == contract["lifecycle_schema"]["sha256"], "LIFECYCLE_SCHEMA_BINDING")
-    record = {**contract["work_unit"], "base_sha": base, "state": "CI_GREEN", "pr_number": pr,
+    governed_base = contract["original_base_sha"]
+    record = {**contract["work_unit"], "base_sha": governed_base, "state": "CI_GREEN", "pr_number": pr,
               "pr_head_sha": head, "ci_context": "PR Verification", "ci_result": "PASS", "ci_head_sha": head,
               "codex_review_state": "NOT_STARTED", "evidence_reference": f"github://{repository}/pull/{pr}/{head}"}
     schema_validate(record, lifecycle_schema, lifecycle_schema)
     verifier_hash = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
-    return {"result": "PASS", "merge_authority": False, "repository": repository, "base_sha": base,
+    return {"result": "PASS", "merge_authority": False, "repository": repository, "base_sha": governed_base,
             "head_sha": head, "pr_number": pr, "verifier_sha256": verifier_hash,
             "contract_sha256": hashlib.sha256(contract_path.read_bytes()).hexdigest(),
             "increment_line_counts": counts, "lifecycle_record": record}
